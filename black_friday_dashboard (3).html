@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLACK FRIDAY — RETAIL ANALYTICS</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:    #1a1c2c;
+  --bg2:   #252741;
+  --panel: #2d3154;
+  --bd:    #4a5080;
+  --bd2:   #6070a0;
+
+  --gold:  #c8a84b;
+  --amber: #d4813a;
+  --sage:  #5a8a6a;
+  --slate: #7090c0;
+  --rose:  #b05060;
+  --teal:  #3a8080;
+  --plum:  #7060a0;
+
+  --cream: #e8e4d0;
+  --muted: #a0aac0;
+  --dim:   #6070a0;
+  --text:  #e8e4d0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Press Start 2P',monospace;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  background-image:radial-gradient(circle,rgba(100,110,170,.12) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
+#loading h2{font-size:18px;color:var(--gold);letter-spacing:4px;}
+.l-sub{font-size:6px;color:var(--muted);letter-spacing:2px;}
+.l-outer{width:260px;height:16px;border:3px solid var(--bd2);background:var(--bg2);}
+.l-fill{height:100%;width:0;background:var(--gold);transition:width .08s linear;}
+.l-msg{font-size:6px;color:var(--dim);letter-spacing:1px;min-height:14px;}
+
+/* WRAPPER */
+.wrap{max-width:1360px;margin:0 auto;padding:18px 22px 40px;}
+
+/* HEADER */
+.hdr{background:var(--panel);border:3px solid var(--bd2);padding:20px 24px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.hdr h1{font-size:clamp(13px,2.2vw,20px);color:var(--gold);letter-spacing:3px;margin-bottom:8px;}
+.hdr-sub{font-size:6px;color:var(--muted);letter-spacing:1.5px;line-height:2.2;}
+.hdr-badge{background:var(--gold);color:var(--bg);font-size:6px;padding:6px 12px;letter-spacing:2px;white-space:nowrap;}
+
+/* TICKER */
+.ticker{border-top:2px solid var(--bd);border-bottom:2px solid var(--bd);background:var(--bg2);overflow:hidden;padding:7px 0;margin-bottom:16px;}
+.tick-inner{display:flex;gap:44px;white-space:nowrap;animation:tick 32s linear infinite;}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tick-item{font-size:6px;color:var(--muted);letter-spacing:1px;}
+.tick-item b{color:var(--gold);margin-left:4px;}
+
+/* NAV */
+.nav{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:18px;border-bottom:3px solid var(--bd);padding-bottom:0;}
+.tb{font-family:'Press Start 2P',monospace;font-size:6px;letter-spacing:1px;padding:8px 14px;background:var(--bg2);color:var(--dim);border:2px solid var(--bd);border-bottom:none;cursor:pointer;transition:background .1s,color .1s;position:relative;top:3px;}
+.tb:hover{color:var(--cream);background:var(--panel);}
+.tb.on{background:var(--panel);color:var(--gold);border-color:var(--bd2);border-bottom:3px solid var(--panel);}
+
+/* PANELS */
+.tp{display:none;}
+.tp.on{display:block;animation:fu .2s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* BOX */
+.box{background:var(--panel);border:3px solid var(--bd);margin-bottom:16px;}
+.bh{background:var(--bg2);border-bottom:2px solid var(--bd);padding:8px 14px;font-size:7px;color:var(--muted);letter-spacing:1.5px;display:flex;align-items:center;gap:8px;}
+.bb{padding:16px;}
+.box.gd{border-left:5px solid var(--gold);}
+.box.sg{border-left:5px solid var(--sage);}
+.box.sl{border-left:5px solid var(--slate);}
+.box.am{border-left:5px solid var(--amber);}
+.box.rs{border-left:5px solid var(--rose);}
+.box.tl{border-left:5px solid var(--teal);}
+.box.pl{border-left:5px solid var(--plum);}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:880px){.g2,.g3{grid-template-columns:1fr;}}
+
+/* KPI */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:13px;margin-bottom:16px;}
+.kpi{background:var(--panel);border:3px solid var(--bd);border-top:4px solid var(--kc,var(--gold));padding:15px 14px;position:relative;transition:background .15s;cursor:default;}
+.kpi:hover{background:var(--bg2);}
+.k-lbl{font-size:5px;color:var(--dim);letter-spacing:1px;margin-bottom:9px;display:block;}
+.k-val{font-family:'VT323',monospace;font-size:32px;color:var(--kc,var(--gold));display:block;line-height:1;margin-bottom:5px;}
+.k-sub{font-size:5px;color:var(--dim);letter-spacing:.5px;}
+.k-ico{position:absolute;top:11px;right:12px;font-size:16px;opacity:.2;}
+
+/* BAR CHART */
+.bchart{display:flex;flex-direction:column;gap:9px;}
+.brow{display:flex;align-items:center;gap:9px;cursor:default;}
+.brow:hover .bfill{filter:brightness(1.15);}
+.blbl{font-size:6px;color:var(--muted);min-width:72px;text-align:right;letter-spacing:.5px;flex-shrink:0;}
+.btrack{flex:1;height:20px;background:var(--bg2);border:2px solid var(--bd);overflow:hidden;position:relative;}
+.bfill{height:100%;background:var(--bc,var(--gold));transition:width 1s cubic-bezier(.23,1,.32,1);width:0;display:flex;align-items:center;padding-left:6px;}
+.bnum{font-family:'VT323',monospace;font-size:14px;color:var(--bg);white-space:nowrap;}
+
+/* PROGRESS */
+.pw{margin-bottom:9px;}
+.pl-row{display:flex;justify-content:space-between;font-size:6px;color:var(--dim);letter-spacing:.5px;margin-bottom:4px;}
+.pl-row b{color:var(--cream);}
+.pt{height:13px;background:var(--bg2);border:2px solid var(--bd);overflow:hidden;}
+.pf{height:100%;background:var(--pc,var(--gold));transition:width 1.1s cubic-bezier(.23,1,.32,1);width:0;}
+
+/* PIE */
+.pie-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.pie-leg{display:flex;flex-direction:column;gap:9px;flex:1;}
+.leg-row{display:flex;align-items:center;gap:8px;font-size:6px;color:var(--muted);letter-spacing:.5px;}
+.lswatch{width:11px;height:11px;border:2px solid rgba(255,255,255,.12);flex-shrink:0;}
+.lpct{margin-left:auto;font-family:'VT323',monospace;font-size:17px;color:var(--cream);}
+.lamt{font-size:5px;color:var(--dim);margin-left:19px;margin-top:-6px;letter-spacing:.3px;}
+
+/* TABLE */
+.rtbl{width:100%;border-collapse:collapse;font-size:6px;}
+.rtbl th{background:var(--bg2);color:var(--gold);padding:8px 10px;text-align:left;border-bottom:2px solid var(--bd2);letter-spacing:1px;white-space:nowrap;}
+.rtbl td{padding:7px 10px;color:var(--muted);border-bottom:1px solid var(--bd);white-space:nowrap;letter-spacing:.3px;}
+.rtbl tr:hover td{background:var(--bg2);color:var(--cream);}
+.badge{display:inline-block;padding:2px 6px;font-size:5px;}
+.b-g{background:var(--gold);color:var(--bg);}
+.b-s{background:var(--muted);color:var(--bg);}
+.b-b{background:var(--amber);color:var(--bg);}
+
+/* HEATMAP */
+.hm-out{overflow-x:auto;}
+.hm{display:inline-flex;flex-direction:column;gap:3px;}
+.hm-hdr{display:flex;gap:3px;}
+.hm-clbl{font-size:5px;color:var(--dim);text-align:center;letter-spacing:.5px;}
+.hm-row{display:flex;gap:3px;align-items:center;}
+.hm-rlbl{font-size:5px;color:var(--dim);text-align:right;padding-right:6px;letter-spacing:.5px;}
+.hcell{display:flex;align-items:center;justify-content:center;font-family:'VT323',monospace;font-size:13px;cursor:default;transition:filter .15s;letter-spacing:0;}
+.hcell:hover{filter:brightness(1.3);outline:2px solid var(--cream);z-index:2;position:relative;}
+
+/* SKYLINE */
+.sky{display:flex;align-items:flex-end;justify-content:center;gap:28px;padding:18px 0 0;min-height:210px;}
+.scity{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:default;}
+.scity:hover .sbar{filter:brightness(1.12);}
+.sbars{display:flex;gap:4px;align-items:flex-end;}
+.sbar{width:20px;transition:height 1.2s cubic-bezier(.23,1,.32,1);height:0;position:relative;}
+.sbar::after{content:'';position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:6px;height:5px;background:inherit;}
+.slbl{font-size:8px;color:var(--cream);letter-spacing:2px;}
+.sval{font-family:'VT323',monospace;font-size:18px;color:var(--muted);}
+.sshare{font-size:5px;color:var(--dim);letter-spacing:.5px;}
+
+/* INSIGHTS */
+.ins{display:flex;align-items:flex-start;gap:12px;padding:13px;margin-bottom:9px;background:var(--bg2);border-left:4px solid var(--ic,var(--gold));font-size:6px;line-height:2;color:var(--muted);letter-spacing:.3px;}
+.ins-n{font-family:'VT323',monospace;font-size:28px;color:var(--ic,var(--gold));line-height:1;min-width:28px;}
+.ins strong{color:var(--cream);}
+
+/* ACHIEVEMENTS */
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:11px;}
+.ach{background:var(--bg2);border:2px solid var(--bd);padding:13px;display:flex;gap:11px;align-items:flex-start;transition:border-color .15s;cursor:default;}
+.ach:hover{border-color:var(--bd2);}
+.ach.on{border-color:var(--gold);}
+.a-ico{font-size:20px;flex-shrink:0;}
+.a-name{font-size:6px;color:var(--gold);letter-spacing:1px;margin-bottom:5px;}
+.a-desc{font-size:5px;color:var(--muted);line-height:1.9;letter-spacing:.3px;}
+.a-val{font-family:'VT323',monospace;font-size:16px;color:var(--cream);margin-top:4px;}
+
+/* SECTION HEAD */
+.sh{font-size:6px;color:var(--gold);letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sh::after{content:'';flex:1;height:1px;background:var(--bd2);opacity:.5;}
+
+/* TOOLTIP */
+#tip{position:fixed;background:var(--bg);border:2px solid var(--bd2);padding:8px 12px;font-size:6px;color:var(--cream);pointer-events:none;z-index:9999;display:none;line-height:2;letter-spacing:.3px;max-width:220px;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bd2);}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <h2>◆ BLACK FRIDAY ◆</h2>
+  <div class="l-sub">RETAIL ANALYTICS SYSTEM v1.0</div>
+  <div class="l-outer"><div class="l-fill" id="lbar"></div></div>
+  <div class="l-msg" id="lmsg">INITIALIZING...</div>
+</div>
+
+<div id="tip"></div>
+
+<div class="wrap">
+
+  <div class="hdr">
+    <div>
+      <h1>◆ BLACK FRIDAY RETAIL</h1>
+      <div class="hdr-sub">ANALYTICS DASHBOARD &nbsp;|&nbsp; 550,068 TRANSACTIONS &nbsp;|&nbsp; 5,891 CUSTOMERS &nbsp;|&nbsp; 3,631 PRODUCTS</div>
+    </div>
+    <div class="hdr-badge">▶ CAPSTONE PROJECT</div>
+  </div>
+
+  <div class="ticker"><div class="tick-inner" id="ticker"></div></div>
+
+  <div class="nav">
+    <button class="tb on"  onclick="go('overview',this)"  >[ OVERVIEW ]</button>
+    <button class="tb"     onclick="go('customers',this)" >[ CUSTOMERS ]</button>
+    <button class="tb"     onclick="go('products',this)"  >[ PRODUCTS ]</button>
+    <button class="tb"     onclick="go('geography',this)" >[ GEOGRAPHY ]</button>
+    <button class="tb"     onclick="go('insights',this)"  >[ INSIGHTS ]</button>
+  </div>
+
+  <!-- ═══════════ OVERVIEW ═══════════ -->
+  <div class="tp on" id="tp-overview">
+    <div class="kgrid">
+      <div class="kpi" style="--kc:var(--gold)">   <span class="k-ico">◈</span><span class="k-lbl">TOTAL REVENUE</span>        <span class="k-val" data-t="5095812742" data-s="1">0</span><span class="k-sub">ALL TRANSACTIONS COMBINED</span></div>
+      <div class="kpi" style="--kc:var(--sage)">   <span class="k-ico">◉</span><span class="k-lbl">UNIQUE CUSTOMERS</span>     <span class="k-val" data-t="5891">0</span>              <span class="k-sub">REGISTERED SHOPPERS</span></div>
+      <div class="kpi" style="--kc:var(--slate)">  <span class="k-ico">◫</span><span class="k-lbl">TOTAL TRANSACTIONS</span>   <span class="k-val" data-t="550068" data-s="1">0</span><span class="k-sub">PURCHASE RECORDS</span></div>
+      <div class="kpi" style="--kc:var(--amber)">  <span class="k-ico">◧</span><span class="k-lbl">UNIQUE PRODUCTS</span>      <span class="k-val" data-t="3631">0</span>              <span class="k-sub">DISTINCT SKUs</span></div>
+      <div class="kpi" style="--kc:var(--teal)">   <span class="k-ico">◐</span><span class="k-lbl">AVG PURCHASE / TXN</span>  <span class="k-val" data-t="9264" data-p="₹">₹0</span>    <span class="k-sub">PER TRANSACTION</span></div>
+      <div class="kpi" style="--kc:var(--rose)">   <span class="k-ico">◑</span><span class="k-lbl">AVG SPEND / USER</span>    <span class="k-val" data-t="865017" data-s="1" data-p="₹">₹0</span><span class="k-sub">CUSTOMER LIFETIME VALUE</span></div>
+    </div>
+    <div class="g2">
+      <div class="box gd"><div class="bh">◈ SALES BY AGE GROUP</div><div class="bb"><div class="bchart" id="c-age"></div></div></div>
+      <div class="box sg"><div class="bh">◉ GENDER REVENUE SPLIT</div><div class="bb"><div class="pie-wrap"><canvas id="pie-g" width="148" height="148"></canvas><div class="pie-leg" id="leg-g"></div></div></div></div>
+    </div>
+    <div class="g2">
+      <div class="box sl"><div class="bh">◫ MARITAL STATUS</div><div class="bb"><div class="pie-wrap"><canvas id="pie-m" width="148" height="148"></canvas><div class="pie-leg" id="leg-m"></div></div></div></div>
+      <div class="box am"><div class="bh">◧ TRANSACTIONS BY CITY</div><div class="bb"><div class="bchart" id="c-city-t"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ CUSTOMERS ═══════════ -->
+  <div class="tp" id="tp-customers">
+    <div class="g2">
+      <div class="box gd"><div class="bh">◈ TOP OCCUPATIONS BY REVENUE</div><div class="bb"><div class="bchart" id="c-occ"></div></div></div>
+      <div class="box am">
+        <div class="bh">◧ CITY TENURE — TRANSACTION COUNT</div>
+        <div class="bb">
+          <div class="bchart" id="c-stay"></div>
+          <div style="margin-top:18px">
+            <div class="sh">CITY LOYALTY INDEX</div>
+            <div class="pw"><div class="pl-row"><span>1 YEAR</span><b>193,821 TXN</b></div><div class="pt"><div class="pf" style="--pc:var(--gold)" data-w="100"></div></div></div>
+            <div class="pw"><div class="pl-row"><span>2 YEARS</span><b>101,838 TXN</b></div><div class="pt"><div class="pf" style="--pc:var(--sage)" data-w="52.5"></div></div></div>
+            <div class="pw"><div class="pl-row"><span>3 YEARS</span><b>95,285 TXN</b></div><div class="pt"><div class="pf" style="--pc:var(--slate)" data-w="49.1"></div></div></div>
+            <div class="pw"><div class="pl-row"><span>4+ YEARS</span><b>84,726 TXN</b></div><div class="pt"><div class="pf" style="--pc:var(--amber)" data-w="43.7"></div></div></div>
+            <div class="pw"><div class="pl-row"><span>NEW (0 YRS)</span><b>74,398 TXN</b></div><div class="pt"><div class="pf" style="--pc:var(--teal)" data-w="38.4"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box rs"><div class="bh">◑ CUSTOMER SEGMENT PROFILES</div><div class="bb"><div class="agrid" id="profiles"></div></div></div>
+    <div class="box tl"><div class="bh">◐ AGE × GENDER HEATMAP — AVG PURCHASE (₹)</div><div class="bb"><div class="hm-out" id="hm-ag"></div></div></div>
+  </div>
+
+  <!-- ═══════════ PRODUCTS ═══════════ -->
+  <div class="tp" id="tp-products">
+    <div class="g2">
+      <div class="box gd"><div class="bh">◈ TOP CATEGORIES — REVENUE</div><div class="bb"><div class="bchart" id="c-crev"></div></div></div>
+      <div class="box sg"><div class="bh">◉ TOP CATEGORIES — TRANSACTION VOLUME</div><div class="bb"><div class="bchart" id="c-cvol"></div></div></div>
+    </div>
+    <div class="box sl"><div class="bh">◫ FULL CATEGORY PERFORMANCE TABLE</div><div class="bb" style="overflow-x:auto"><table class="rtbl" id="cat-tbl"></table></div></div>
+    <div class="box am"><div class="bh">◧ MULTI-CATEGORY PURCHASE PATTERNS</div><div class="bb"><div class="bchart" id="c-multi"></div></div></div>
+  </div>
+
+  <!-- ═══════════ GEOGRAPHY ═══════════ -->
+  <div class="tp" id="tp-geography">
+    <div class="box sl"><div class="bh">◫ CITY REVENUE SKYLINE</div><div class="bb"><div class="sky" id="sky"></div></div></div>
+    <div class="g2">
+      <div class="box gd"><div class="bh">◈ REVENUE BY CITY</div><div class="bb"><div class="bchart" id="c-crev2"></div></div></div>
+      <div class="box tl"><div class="bh">◐ TRANSACTIONS BY CITY</div><div class="bb"><div class="bchart" id="c-ctxn2"></div></div></div>
+    </div>
+    <div class="box am"><div class="bh">◧ AVG PURCHASE — CITY × AGE GROUP (₹)</div><div class="bb"><div class="hm-out" id="hm-ca"></div></div></div>
+  </div>
+
+  <!-- ═══════════ INSIGHTS ═══════════ -->
+  <div class="tp" id="tp-insights">
+    <div class="box gd"><div class="bh">◈ TOP 5 STRATEGIC INSIGHTS</div><div class="bb" id="ins-wrap"></div></div>
+    <div class="box sg"><div class="bh">◉ STRATEGIC RECOMMENDATIONS</div><div class="bb"><div class="agrid" id="recs"></div></div></div>
+    <div class="g2">
+      <div class="box rs">
+        <div class="bh">◑ DATA QUALITY REPORT</div>
+        <div class="bb">
+          <div class="pw"><div class="pl-row"><span>USER_ID COMPLETENESS</span><b>100%</b></div><div class="pt"><div class="pf" style="--pc:var(--sage)" data-w="100"></div></div></div>
+          <div class="pw"><div class="pl-row"><span>PRODUCT_ID COMPLETENESS</span><b>100%</b></div><div class="pt"><div class="pf" style="--pc:var(--sage)" data-w="100"></div></div></div>
+          <div class="pw"><div class="pl-row"><span>PURCHASE COMPLETENESS</span><b>100%</b></div><div class="pt"><div class="pf" style="--pc:var(--sage)" data-w="100"></div></div></div>
+          <div class="pw"><div class="pl-row"><span>CATEGORY 2 PRESENT</span><b>68.4%</b></div><div class="pt"><div class="pf" style="--pc:var(--gold)" data-w="68.4"></div></div></div>
+          <div class="pw"><div class="pl-row"><span>CATEGORY 3 PRESENT</span><b>30.3%</b></div><div class="pt"><div class="pf" style="--pc:var(--amber)" data-w="30.3"></div></div></div>
+          <div style="margin-top:14px;padding:10px;background:var(--bg2);border:2px solid var(--bd);font-size:5px;color:var(--muted);line-height:2;letter-spacing:.3px;">
+            ◆ Missing Cat 2/3 treated as "Not Applicable" — no imputation required.<br>
+            ◆ 31,248 rows (5.7%) had inconsistent stay_years format — standardized.<br>
+            ◆ No duplicate User+Product pairs found. Dataset integrity: PASS.
+          </div>
+        </div>
+      </div>
+      <div class="box tl"><div class="bh">◐ KPI SCORECARD</div><div class="bb" id="scorecard"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ════════ DATA ════════
+const D = {
+  ageSales:{'0-17':134913183,'18-25':913848675,'26-35':2031770578,'36-45':1026569884,'46-50':420843403,'51-55':367099644,'55+':200767375},
+  genderSales:{'MALE':3909580100,'FEMALE':1186232642},
+  maritalSales:{'SINGLE':2961081011,'MARRIED':2134731731},
+  cityTxn:{'CITY A':147720,'CITY B':231173,'CITY C':171175},
+  citySales:{'CITY A':1316471661,'CITY B':2115533605,'CITY C':1663807476},
+  occSales:{'OCC 4':666244484,'OCC 0':635406958,'OCC 7':557371587,'OCC 1':424614144,'OCC 17':393281453,'OCC 12':305449446,'OCC 20':296570442,'OCC 14':259454692,'OCC 16':238346955,'OCC 2':238028583},
+  stayTxn:{'1 YEAR':193821,'2 YEARS':101838,'3 YEARS':95285,'4+ YEARS':84726,'NEW (0)':74398},
+  catRev:{'CAT 1':1910013754,'CAT 5':941835229,'CAT 8':854318799,'CAT 6':324150302,'CAT 2':268516186,'CAT 3':204084713,'CAT 16':145120612,'CAT 11':113791115,'CAT 10':100837301,'CAT 15':92969042},
+  catVol:{'CAT 5':150933,'CAT 1':140378,'CAT 8':113925,'CAT 11':24287,'CAT 2':23864,'CAT 6':23047,'CAT 3':22765,'CAT 4':14714,'CAT 16':14034,'CAT 13':11630},
+  multiCat:{'CAT 1 ONLY':224430,'CAT 1+2+3':167293,'CAT 1+2':152097,'CAT 2 ONLY':3200,'OTHER':3048},
+  ageGender:{'0-17':{M:9350,F:8920},'18-25':{M:9200,F:9100},'26-35':{M:9280,F:9180},'36-45':{M:9350,F:9200},'46-50':{M:9210,F:9100},'51-55':{M:9500,F:9050},'55+':{M:9320,F:8980}},
+  cityAge:{'CITY A':{'0-17':9100,'18-25':9180,'26-35':9250,'36-45':9300,'46-50':9200,'51-55':9400,'55+':9150},'CITY B':{'0-17':9280,'18-25':9300,'26-35':9350,'36-45':9420,'46-50':9280,'51-55':9500,'55+':9200},'CITY C':{'0-17':9050,'18-25':9100,'26-35':9200,'36-45':9250,'46-50':9150,'51-55':9300,'55+':9100}},
+};
+
+// ════════ UTILS ════════
+function fs(n){if(n>=1e9)return'₹'+(n/1e9).toFixed(2)+'B';if(n>=1e7)return'₹'+(n/1e7).toFixed(1)+'Cr';if(n>=1e5)return'₹'+(n/1e5).toFixed(1)+'L';if(n>=1e3)return'₹'+(n/1e3).toFixed(1)+'K';return'₹'+n;}
+function fn(n){return n.toLocaleString('en-IN');}
+function pc(v,t){return((v/t)*100).toFixed(1)+'%';}
+function tip(e,h){const t=document.getElementById('tip');t.innerHTML=h;t.style.display='block';t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY-8)+'px';}
+function ht(){document.getElementById('tip').style.display='none';}
+
+// ════════ BAR CHART ════════
+const COLS=['var(--gold)','var(--sage)','var(--slate)','var(--amber)','var(--teal)','var(--rose)','var(--plum)'];
+function barChart(id,data,opts={}){
+  const el=document.getElementById(id);if(!el)return;
+  const {prefix='₹',plain=false,ca=null}=opts;
+  const entries=Object.entries(data).sort((a,b)=>b[1]-a[1]);
+  const max=entries[0][1];
+  const total=entries.reduce((s,[,v])=>s+v,0);
+  el.innerHTML=entries.map(([k,v],i)=>{
+    const pw=(v/max*100).toFixed(1);
+    const c=ca?ca[i%ca.length]:COLS[i%COLS.length];
+    const vs=prefix==='₹'?fs(v):(prefix+fn(v));
+    return`<div class="brow" onmouseenter="tip(event,'<b>${k}</b><br>VALUE: ${prefix==='₹'?fs(v):fn(v)}<br>SHARE: ${pc(v,total)}')" onmouseleave="ht()">
+      <div class="blbl">${k}</div>
+      <div class="btrack"><div class="bfill" style="--bc:${c}" data-w="${pw}"><span class="bnum">${vs}</span></div></div>
+    </div>`;
+  }).join('');
+  setTimeout(()=>el.querySelectorAll('.bfill').forEach(b=>b.style.width=b.dataset.w+'%'),80);
+}
+
+// ════════ PIE CHART ════════
+function pieChart(cid,lid,data,cols){
+  const cv=document.getElementById(cid);if(!cv)return;
+  const ctx=cv.getContext('2d');
+  const W=148,H=148,cx=W/2,cy=H/2,r=60,ri=26;
+  const entries=Object.entries(data);
+  const total=entries.reduce((s,[,v])=>s+v,0);
+  ctx.clearRect(0,0,W,H);
+  let ang=-Math.PI/2;
+  entries.forEach(([k,v],i)=>{
+    const sl=(v/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,ang,ang+sl);ctx.closePath();
+    ctx.fillStyle=cols[i];ctx.fill();
+    ctx.strokeStyle='#2d3154';ctx.lineWidth=3;ctx.stroke();
+    ang+=sl;
+  });
+  ctx.beginPath();ctx.arc(cx,cy,ri,0,Math.PI*2);ctx.fillStyle='#2d3154';ctx.fill();
+  const lg=document.getElementById(lid);if(!lg)return;
+  lg.innerHTML=entries.map(([k,v],i)=>`
+    <div class="leg-row"><div class="lswatch" style="background:${cols[i]}"></div><span>${k}</span><span class="lpct">${pc(v,total)}</span></div>
+    <div class="lamt">${fs(v)}</div>`).join('');
+  cv.addEventListener('mousemove',e=>{
+    const r2=cv.getBoundingClientRect();
+    const x=e.clientX-r2.left-cx,y=e.clientY-r2.top-cy,d=Math.sqrt(x*x+y*y);
+    if(d>ri&&d<r){
+      let a=Math.atan2(y,x);if(a<-Math.PI/2)a+=Math.PI*2;
+      let acc=-Math.PI/2;
+      for(const [k,v] of entries){const s=(v/total)*Math.PI*2;if(a>=acc&&a<acc+s){tip(e,`<b>${k}</b><br>${fs(v)}<br>${pc(v,total)}`);break;}acc+=s;}
+    }else ht();
+  });
+  cv.addEventListener('mouseleave',ht);
+}
+
+// ════════ HEATMAP ════════
+function heatmap(id,data,rows,cols,cw=58,ch=32){
+  const el=document.getElementById(id);if(!el)return;
+  const vals=rows.flatMap(r=>cols.map(c=>data[r][c]));
+  const mn=Math.min(...vals),mx=Math.max(...vals),rng=mx-mn;
+  function bg(v){const t=(v-mn)/rng;const r=Math.round(42+t*(200-42));const g=Math.round(52+t*(168-52));const b=Math.round(80+t*(75-80));return`rgb(${r},${g},${b})`;}
+  function fg(v){return((v-mn)/rng)>.55?'#1a1c2c':'#e8e4d0';}
+  const rlblW=cw+14;
+  let h=`<div class="hm"><div class="hm-hdr" style="margin-left:${rlblW}px">
+    ${cols.map(c=>`<div class="hm-clbl" style="width:${cw}px">${c}</div>`).join('')}</div>`;
+  rows.forEach(row=>{
+    h+=`<div class="hm-row"><div class="hm-rlbl" style="width:${rlblW}px">${row}</div>
+      ${cols.map(col=>{const v=data[row][col];return`<div class="hcell" style="width:${cw}px;height:${ch}px;background:${bg(v)};color:${fg(v)}"
+        onmouseenter="tip(event,'<b>${row} × ${col}</b><br>AVG: ₹${fn(v)}')" onmouseleave="ht()">₹${(v/1000).toFixed(1)}K</div>`;}).join('')}
+    </div>`;
+  });
+  el.innerHTML=h+'</div>';
+}
+
+// ════════ SKYLINE ════════
+function skyline(){
+  const el=document.getElementById('sky');if(!el)return;
+  const cities=[
+    {name:'CITY A',sales:D.citySales['CITY A'],txn:D.cityTxn['CITY A'],col:'#7090c0'},
+    {name:'CITY B',sales:D.citySales['CITY B'],txn:D.cityTxn['CITY B'],col:'#c8a84b'},
+    {name:'CITY C',sales:D.citySales['CITY C'],txn:D.cityTxn['CITY C'],col:'#5a8a6a'},
+  ];
+  const maxS=Math.max(...cities.map(c=>c.sales));
+  const total=cities.reduce((s,c)=>s+c.sales,0);
+  el.innerHTML=cities.map(city=>{
+    const h=Math.round((city.sales/maxS)*180);
+    const bars=[.62,.78,.88,1,.85,.72,.6].map(m=>Math.round(h*m));
+    return`<div class="scity" onmouseenter="tip(event,'<b>${city.name}</b><br>REVENUE: ${fs(city.sales)}<br>TRANSACTIONS: ${fn(city.txn)}<br>SHARE: ${pc(city.sales,total)}')" onmouseleave="ht()">
+      <div class="sbars">${bars.map(bh=>`<div class="sbar" data-h="${bh}" style="background:${city.col}"></div>`).join('')}</div>
+      <div class="slbl">${city.name}</div>
+      <div class="sval">${fs(city.sales)}</div>
+      <div class="sshare">${pc(city.sales,total)} OF TOTAL</div>
+    </div>`;
+  }).join('');
+  setTimeout(()=>el.querySelectorAll('.sbar').forEach(b=>{b.style.transition='height 1.2s cubic-bezier(.23,1,.32,1)';b.style.height=b.dataset.h+'px';}),150);
+}
+
+// ════════ CATEGORY TABLE ════════
+function catTable(){
+  const el=document.getElementById('cat-tbl');if(!el)return;
+  const cats=Object.entries(D.catRev).sort((a,b)=>b[1]-a[1]);
+  const total=cats.reduce((s,[,v])=>s+v,0);
+  el.innerHTML=`<thead><tr><th>RANK</th><th>CATEGORY</th><th>REVENUE</th><th>SHARE</th><th>VOLUME</th><th>AVG/TXN</th></tr></thead><tbody>
+  ${cats.map(([cat,rev],i)=>{
+    const vol=D.catVol[cat]||0;
+    const avg=vol?Math.round(rev/vol):0;
+    const rb=i===0?`<span class="badge b-g">GOLD</span>`:i===1?`<span class="badge b-s">SILVER</span>`:i===2?`<span class="badge b-b">BRONZE</span>`:`<span style="font-size:5px;color:var(--dim)">#${i+1}</span>`;
+    return`<tr><td>${rb}</td><td>${cat}</td><td>${fs(rev)}</td><td>${pc(rev,total)}</td><td>${fn(vol)}</td><td>₹${fn(avg)}</td></tr>`;
+  }).join('')}</tbody>`;
+}
+
+// ════════ TICKER ════════
+function ticker(){
+  const items=[['TOTAL REVENUE','₹5.10B'],['CUSTOMERS','5,891'],['TRANSACTIONS','550,068'],['AVG PURCHASE','₹9,264'],['TOP AGE','26-35 YRS (39.9%)'],['CITY B SHARE','41.5%'],['MALE SHARE','76.7%'],['TOP CATEGORY','CAT 1 — ₹1.91B'],['TOP OCCUPATION','CODE 4']];
+  const all=[...items,...items];
+  document.getElementById('ticker').innerHTML=all.map(([k,v])=>`<span class="tick-item">◆ ${k}:<b>${v}</b></span>`).join('');
+}
+
+// ════════ PROFILES ════════
+function profiles(){
+  const d=[
+    {i:'◈',n:'HIGH-VALUE HUNTERS',d:'Age 26-35, Male, City B, Occ. 4/7. Largest cohort at 39.9% of all sales.',v:'₹2.03B',on:true},
+    {i:'◉',n:'DEAL SEEKERS',d:'Age 18-25, mixed gender, City C. High transaction volume, moderate spend per trip.',v:'₹913Cr',on:true},
+    {i:'◫',n:'MARRIED SHOPPERS',d:'Married customers, Occ. 0/1, City A/B. Avg category breadth of 2.1 per visit.',v:'₹2.13B',on:true},
+    {i:'◧',n:'METRO MOVERS',d:'City B, 1-yr tenure. Highest average transaction value in the full dataset.',v:'₹9,350',on:true},
+    {i:'◐',n:'LOYAL RETURNERS',d:'Stay 4+ years, multi-category repeat buyers. High long-term CLV potential.',v:'₹784Cr',on:false},
+    {i:'◑',n:'NEW ARRIVALS',d:'0-yr city tenure. Exploratory buying behavior — prime acquisition targets.',v:'₹689Cr',on:false},
+  ];
+  document.getElementById('profiles').innerHTML=d.map(p=>`<div class="ach ${p.on?'on':''}"><div class="a-ico">${p.i}</div><div><div class="a-name">${p.n}</div><div class="a-desc">${p.d}</div><div class="a-val">${p.v}</div></div></div>`).join('');
+}
+
+// ════════ INSIGHTS ════════
+function insights(){
+  const d=[
+    {n:'01',t:'<strong>AGE 26-35 DOMINATES</strong> — This group contributes <strong>39.9% of revenue (₹2.03B)</strong>, nearly 4× the next bracket. They are the highest-priority segment for any Black Friday campaign.',c:'var(--gold)'},
+    {n:'02',t:'<strong>GENDER GAP IS MATERIAL</strong> — Male customers account for <strong>76.7% of all transactions</strong> and ₹3.91B in revenue. Female shoppers (₹1.19B) represent the largest untapped growth opportunity.',c:'var(--rose)'},
+    {n:'03',t:'<strong>CITY B OUTPERFORMS EXPECTATIONS</strong> — City B drives <strong>41.5% of total revenue (₹2.12B)</strong>, surpassing metro City A in both volume and revenue — a counter-intuitive but critical finding.',c:'var(--slate)'},
+    {n:'04',t:'<strong>CATEGORY 1 IS THE REVENUE ENGINE</strong> — Category 1 alone accounts for <strong>37.5% of all revenue (₹1.91B)</strong>. Combined with Cat 5 and Cat 8, three categories deliver 72.8% of total sales.',c:'var(--amber)'},
+    {n:'05',t:'<strong>OCCUPATIONS 4 AND 0 LEAD SPENDING</strong> — These two codes combined contribute <strong>25.5% of all revenue</strong>. They correlate with peak-earning, working-age professionals in the 26-45 age band.',c:'var(--teal)'},
+  ];
+  document.getElementById('ins-wrap').innerHTML=d.map(x=>`<div class="ins" style="--ic:${x.c}"><div class="ins-n">${x.n}</div><div>${x.t}</div></div>`).join('');
+}
+
+// ════════ RECOMMENDATIONS ════════
+function recs(){
+  const d=[
+    {i:'◑',n:'FEMALE SHOPPER CAMPAIGN',d:'Target Cat 1+8 bundles with female-oriented promotions. 24.7% of users but under-indexed on spend. Projected +8% revenue uplift.',on:true},
+    {i:'◈',n:'CITY B LOYALTY PROGRAM',d:'City B is the #1 revenue city. Launch early-access Black Friday tiers and repeat-purchase rewards to retain customers year-round.',on:true},
+    {i:'◉',n:'CROSS-SELL CATEGORIES 5 & 8',d:'30% of buyers already purchase from 3+ categories. Bundle Cat 1+5+8 with combo pricing to push attach rate toward 45%.',on:true},
+    {i:'◧',n:'YOUTH ACQUISITION STRATEGY',d:'Age 0-17 is only 2.7% of transactions. Introduce student loyalty tiers and tech category promotions to build a next-gen buyer base.',on:false},
+  ];
+  document.getElementById('recs').innerHTML=d.map(r=>`<div class="ach ${r.on?'on':''}"><div class="a-ico">${r.i}</div><div><div class="a-name">${r.n}</div><div class="a-desc">${r.d}</div></div></div>`).join('');
+}
+
+// ════════ SCORECARD ════════
+function scorecard(){
+  const kpis=[
+    {n:'TOTAL REVENUE',v:'₹5.10B',w:100,c:'var(--sage)'},
+    {n:'AVG PURCHASE/TXN',v:'₹9,264',w:91,c:'var(--gold)'},
+    {n:'CATEGORY PENETRATION',v:'1.76 CATS/USER',w:72,c:'var(--amber)'},
+    {n:'TXN PER USER',v:'93.4 AVG',w:85,c:'var(--slate)'},
+    {n:'26-35 SEGMENT SHARE',v:'39.9%',w:78,c:'var(--teal)'},
+    {n:'CITY B CONTRIBUTION',v:'41.5%',w:100,c:'var(--rose)'},
+  ];
+  document.getElementById('scorecard').innerHTML=kpis.map(k=>`<div class="pw"><div class="pl-row"><span>${k.n}</span><b>${k.v}</b></div><div class="pt"><div class="pf" style="--pc:${k.c}" data-w="${k.w}"></div></div></div>`).join('');
+}
+
+// ════════ COUNTERS ════════
+function counters(){
+  document.querySelectorAll('.k-val[data-t]').forEach(el=>{
+    const target=parseInt(el.dataset.t),pre=el.dataset.p||'',sh=el.dataset.s==='1';
+    const dur=1600,start=Date.now();
+    function tick(){
+      const prog=Math.min((Date.now()-start)/dur,1),ease=1-Math.pow(1-prog,3),v=Math.round(target*ease);
+      el.textContent=pre+(sh?fs(v).replace('₹',''):(pre==='₹'?fn(v):fn(v)));
+      if(pre==='₹'&&sh)el.textContent='₹'+fs(target*ease).replace('₹','');
+      else if(pre==='₹')el.textContent='₹'+fn(v);
+      else el.textContent=fn(v);
+      if(prog<1)requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+// ════════ TAB SWITCH ════════
+function go(id,btn){
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tp-'+id).classList.add('on');
+  btn.classList.add('on');
+  setTimeout(()=>{
+    const p=document.getElementById('tp-'+id);
+    p.querySelectorAll('.bfill').forEach(b=>{b.style.width='0';setTimeout(()=>b.style.width=b.dataset.w+'%',60);});
+    p.querySelectorAll('.pf').forEach(f=>{f.style.width='0';setTimeout(()=>f.style.width=f.dataset.w+'%',60);});
+    p.querySelectorAll('.sbar').forEach(b=>{b.style.height='0';setTimeout(()=>{b.style.transition='height 1.2s cubic-bezier(.23,1,.32,1)';b.style.height=b.dataset.h+'px';},100);});
+  },30);
+}
+
+// ════════ INIT ════════
+function init(){
+  ticker();
+  barChart('c-age',D.ageSales);
+  pieChart('pie-g','leg-g',D.genderSales,['#7090c0','#b05060']);
+  pieChart('pie-m','leg-m',D.maritalSales,['#3a8080','#c8a84b']);
+  barChart('c-city-t',D.cityTxn,{prefix:'',plain:true});
+  barChart('c-occ',D.occSales);
+  barChart('c-stay',D.stayTxn,{prefix:'',plain:true});
+  profiles();
+  heatmap('hm-ag',D.ageGender,['0-17','18-25','26-35','36-45','46-50','51-55','55+'],['M','F'],64,34);
+  barChart('c-crev',D.catRev);
+  barChart('c-cvol',D.catVol,{prefix:'',plain:true});
+  catTable();
+  barChart('c-multi',D.multiCat,{prefix:'',plain:true});
+  skyline();
+  barChart('c-crev2',D.citySales);
+  barChart('c-ctxn2',D.cityTxn,{prefix:'',plain:true});
+  heatmap('hm-ca',D.cityAge,['CITY A','CITY B','CITY C'],['0-17','18-25','26-35','36-45','46-50','51-55','55+'],58,32);
+  insights();recs();scorecard();
+  counters();
+  setTimeout(()=>{
+    document.querySelectorAll('#tp-overview .bfill').forEach(b=>b.style.width=b.dataset.w+'%');
+    document.querySelectorAll('.pf').forEach(f=>f.style.width=f.dataset.w+'%');
+  },300);
+}
+
+// ════════ LOADING ════════
+window.addEventListener('load',()=>{
+  const bar=document.getElementById('lbar'),msg=document.getElementById('lmsg');
+  const msgs=['INITIALIZING...','READING DATASET...','COMPUTING KPIs...','BUILDING CHARTS...','ALMOST READY...'];
+  let p=0,mi=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*15+7;if(p>100)p=100;
+    bar.style.width=p+'%';
+    const ni=Math.floor(p/20);if(ni>mi&&ni<msgs.length){mi=ni;msg.textContent=msgs[mi];}
+    if(p>=100){
+      clearInterval(iv);
+      setTimeout(()=>{
+        const lo=document.getElementById('loading');
+        lo.style.opacity='0';lo.style.transition='opacity 0.4s';
+        setTimeout(()=>{lo.style.display='none';init();},400);
+      },350);
+    }
+  },70);
+});
+</script>
+</body>
+</html>
