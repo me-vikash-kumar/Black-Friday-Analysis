@@ -6,6 +6,8 @@ Interactive visualizations and dashboards are provided to make the insights clea
 
 You can explore the interactive dashboard here:  
 [Black Friday Dashboard](https://me-vikash-kumar.github.io/Black-Friday-Analysis/index.html)
+<img width="1326" height="816" alt="image" src="https://github.com/user-attachments/assets/c7d8775f-f90a-4e0f-b28c-6f880bb5a2bd" />
+
 
 ## Key Highlights
 - Visualizations of customer demographics such as age, gender, occupation, and city category.
